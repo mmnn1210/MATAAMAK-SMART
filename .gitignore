@@ -1,0 +1,22 @@
+# لا ترفع مجلد node_modules (بيتثبّت بـ npm install)
+node_modules/
+
+# لا ترفع ملف البيئة (قد يحتوي كلمات سر)
+.env
+
+# لا ترفع ملفات السجلات
+*.log
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+
+# أنظمة التشغيل
+.DS_Store
+Thumbs.db
+
+# المجلدات المؤقتة
+temp/
+tmp/
+
+# ملفات المطورين (VS Code)
+.vscode/

@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "name": "برجر لحم",
+    "price": 1500,
+    "category": "أطباق رئيسية",
+    "image": "burger.jpg"
+  },
+  {
+    "id": 2,
+    "name": "بيتزا مارغريتا",
+    "price": 2500,
+    "category": "بيتزا",
+    "image": "pizza.jpg"
+  },
+  {
+    "id": 3,
+    "name": "كولا",
+    "price": 500,
+    "category": "مشروبات باردة",
+    "image": "cola.jpg"
+  },
+  {
+    "id": 4,
+    "name": "شاي بالنعنع",
+    "price": 300,
+    "category": "مشروبات ساخنة",
+    "image": "tea.jpg"
+  },
+  {
+    "id": 5,
+    "name": "كعكة شوكولاتة",
+    "price": 1000,
+    "category": "حلويات",
+    "image": "cake.jpg"
+  },
+  {
+    "name": "بيتزا الفصول الاربعة",
+    "price": 20000,
+    "category": "بيتزا",
+    "image": "",
+    "id": 1753306016950
+  },
+  {
+    "name": "شاورما",
+    "price": 20000,
+    "category": "أطباق رئيسية",
+    "image": "",
+    "id": 1753309917227
+  }
+]

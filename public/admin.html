@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>لوحة التحكم - مطعمك الذكي</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Tajawal", sans-serif;
+        background: #ffffff;
+        color: #120603;
+        margin: 40px 20px;
+      }
+      .admin-header {
+        text-align: center;
+        font-size: 2.2rem;
+        font-weight: bold;
+        color: #111;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 10px;
+        margin: 0 auto 30px;
+        width: fit-content;
+      }
+      .back-btn {
+        display: inline-block;
+        margin: 20px 0;
+        padding: 10px 20px;
+        background: #1976d2;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: bold;
+      }
+      #addForm {
+        display: grid;
+        gap: 15px;
+        margin: 20px 0;
+        background: #f9f9f9;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #ddd;
+      }
+      #addForm input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 1rem;
+      }
+      #addForm button {
+        background: #070606;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      #menu-list {
+        list-style: none;
+        margin: 20px 0;
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #eee;
+        border-radius: 8px;
+      }
+      #menu-list li {
+        background: #fff;
+        padding: 12px;
+        margin: 8px 0;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: 1px solid #eee;
+      }
+      #menu-list li button {
+        background: #d6336c;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+
+      .order-card {
+        border: 2px solid #d6336c;
+        margin: 15px 0;
+        padding: 15px;
+        border-radius: 10px;
+        background: #fffbe6;
+        position: relative;
+      }
+      .order-header {
+        font-size: 1.3em;
+        color: #d6336c;
+        margin-bottom: 10px;
+      }
+      .items-list {
+        list-style: disc;
+        margin: 10px 20px;
+      }
+      .total {
+        font-weight: bold;
+        color: #1976d2;
+      }
+      .done-btn {
+        background: #4caf50;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        float: left;
+      }
+      .no-orders {
+        text-align: center;
+        color: #666;
+        font-size: 1.2em;
+        margin: 40px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 class="admin-header">📋 لوحة التحكم - مطعمك الذكي</h1>
+    <a href="/" class="back-btn">العودة للقائمة</a>
+   <p id="daily-sales">مبيعات اليوم: 0 ل.س</p>
+<p id="monthly-sales">مبيعات الشهر: 0 ل.س</p>
+    <div class="sales-controls">
+  <button onclick="resetDailySales()" style="background:#ff5722; color:white; border:none; padding:10px 20px; border-radius:8px;">مسح مبيعات اليوم</button>
+  <button onclick="resetMonthlySales()" style="background:#e91e63; color:white; border:none; padding:10px 20px; border-radius:8px;">مسح مبيعات الشهر</button>
+</div>
+    <!-- إضافة صنف جديد -->
+    <h2 style="text-align: center; color: #d6336c">➕ أضف صنف جديد</h2>
+    <form id="addForm">
+      <input type="text" placeholder="اسم الصنف" id="name" required />
+      <input type="number" placeholder="السعر" id="price" required />
+      <input
+        type="text"
+        placeholder="الفئة (مثلاً: بيتزا)"
+        id="category"
+        required
+      />
+      <input
+        type="text"
+        placeholder="اسم الصورة (مثلاً: pizza.jpg)"
+        id="image"
+      />
+      <button type="submit">إضافة</button>
+    </form>
+
+    <!-- إدارة الأصناف -->
+    <h2 style="text-align: center; color: #d6336c">🗑️ إدارة الأصناف</h2>
+    <ul id="menu-list"></ul>
+
+    <!-- الطلبات الجديدة -->
+    <h2 style="text-align: center; color: #d6336c">📬 الطلبات الجديدة</h2>
+    <div id="orders-list">
+      <p class="no-orders">جاري تحميل الطلبات...</p>
+    </div>
+
+    <!-- ربط الملفات -->
+    <script src="admin.js"></script>
+  </body>
+</html>
