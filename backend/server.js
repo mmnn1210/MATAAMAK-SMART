@@ -13,7 +13,6 @@ app.use(express.static("public"));
 // Routes
 app.use("/api/menu", require("./routes/menu"));
 app.use("/api/orders", require("./routes/orders"));
-app.use('/api/sales', require('./routes/sales'));// الجذر
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/index.html"));
 });

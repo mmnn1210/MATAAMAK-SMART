@@ -109,9 +109,9 @@ section h2 {
 }
 /* ألوان حسب الأقسام */
 .item-card.pizza {
-  --glow-1: #ff6b6b;
-  --glow-2: #f06595;
-  --glow-3: #ff8787;
+  --glow-1: #fb5858;
+  --glow-2: #f45d6a;
+  --glow-3: #f7646b;
   --glow-4: #f783ac;
 }
 .item-card.salads {
@@ -128,8 +128,8 @@ section h2 {
 }
 .item-card.koktel {
   --glow-1: #4dd0e1;
-  --glow-2: #00acc1;
-  --glow-3: #80deea;
+  --glow-2: #00c184;
+  --glow-3: #e780ea;
   --glow-4: #26c6da;
 }
 .item-card.main {
@@ -146,15 +146,15 @@ section h2 {
 }
 .item-card.cold {
   --glow-1: #64b5f6;
-  --glow-2: #2196f3;
+  --glow-2: #0f35f1;
   --glow-3: #90caf9;
   --glow-4: #42a5f5;
 }
 .item-card.hot {
-  --glow-1: #f48fb1;
-  --glow-2: #e91e63;
-  --glow-3: #f06292;
-  --glow-4: #ec407a;
+  --glow-1: #fcb69b;
+  --glow-2: #e9391e;
+  --glow-3: #f09d62;
+  --glow-4: #ec4040;
 }
 .item-card.soups {
   --glow-1: #f7e279;
@@ -174,11 +174,17 @@ section h2 {
   --glow-3: #f0b762;
   --glow-4: #eca440;
 }
-.item-card.offers {
+ .item-card.offers {
   --glow-1: #fdd835;
+  --glow-2: #ff5f3b;
+  --glow-3: #3fc9f3;
+  --glow-4: #2dfb5a;
+}
+.item-card.mashawe{
+  --glow-1: #7d690f;
   --glow-2: #ffeb3b;
   --glow-3: #fff176;
-  --glow-4: #fbc02d;
+  --glow-4: #56410b;
 }
 /* عداد الكمية */
 .counter {
@@ -727,4 +733,140 @@ section h2 {
 .cart-item button:first-child {
   background: #1976d2;
   color: white;
+}
+/* تصميم بطاقات الطلبات */
+.order-card {
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #f0f0f0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.order-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.order-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 6px;
+  height: 100%;
+  background: linear-gradient(to bottom, #ff6b6b, #e91e63);
+  border-radius: 0 8px 8px 0;
+}
+
+/* رأس الطلب */
+.order-header {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #111;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.order-header::before {
+  content: '🍽️';
+}
+
+/* قائمة الأصناف */
+.items-list {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+  font-size: 0.95rem;
+  color: #333;
+}
+
+.items-list li {
+  padding: 4px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.items-list li:last-child {
+  border-bottom: none;
+}
+
+/* المجموع */
+.total {
+  font-weight: bold;
+  color: #1976d2;
+  font-size: 1.1rem;
+  margin: 10px 0;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* زر "تم" */
+.done-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: #4caf50;
+  color: white;
+  border: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease;
+}
+
+.done-btn:hover {
+  background: #388e3c;
+}
+
+/* وقت الطلب */
+.order-card small {
+  color: #777;
+  font-size: 0.85rem;
+  display: block;
+  text-align: left;
+  margin-top: 6px;
+}
+
+/* رسالة "لا طلبات" */
+.no-orders {
+  text-align: center;
+  color: #999;
+  font-size: 1.1rem;
+  padding: 30px;
+  margin: 20px 0;
+  background: #f8f9fa;
+  border-radius: 12px;
+  border: 2px dashed #e0e0e0;
+}
+
+/* تنسيق عام للقائمة */
+#orders-list {
+  padding: 0 10px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* تأثير عند إرسال الطلب */
+.order-card {
+  animation: fadeInUp 0.4s ease forwards;
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

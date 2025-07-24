@@ -1,10 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-// مسار ملف الطلبات
+// 📁 مسار ملف الطلبات
 const filePath = path.join(__dirname, '../../data/orders.json');
 
-// قراءة الطلبات
+// 🔍 قراءة الطلبات من الملف
 function readOrders() {
   if (fs.existsSync(filePath)) {
     const data = fs.readFileSync(filePath, 'utf8');
@@ -13,41 +13,20 @@ function readOrders() {
   return [];
 }
 
-// حفظ الطلبات
+// 💾 حفظ الطلبات في الملف
 function writeOrders(data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
 }
 
-// تحميل الطلبات
+// 🚀 تحميل الطلبات عند تشغيل السيرفر
 let orders = readOrders();
-// ✅ تصدير الدوال
+
+// 📤 إرجاع الطلبات للعميل
 exports.getOrders = (req, res) => {
   res.json(orders);
 };
 
-// **************************************
-// ✅ مسار ملف المبيعات
-// **************************************
-const salesFilePath = path.join(__dirname, '../../data/sales.json');
-
-// قراءة المبيعات
-function readSales() {
-  if (fs.existsSync(salesFilePath)) {
-    const data = fs.readFileSync(salesFilePath, 'utf8');
-    return JSON.parse(data);
-  }
-  return { dailySales: 0, monthlySales: 0 };
-}
-
-// حفظ المبيعات
-function writeSales(data) {
-  fs.writeFileSync(salesFilePath, JSON.stringify(data, null, 2), 'utf8');
-}
-
-// تحميل المبيعات
-let sales = readSales();
-
-// إضافة طلب جديد
+// ➕ إضافة طلب جديد
 exports.addOrder = (req, res) => {
   const order = {
     ...req.body,
@@ -55,31 +34,37 @@ exports.addOrder = (req, res) => {
     timestamp: new Date().toISOString()
   };
 
-  // إضافة الطلب
   orders.push(order);
-
-  // ✅ إضافة المبلغ إلى المبيعات
-  sales.dailySales += order.total || 0;
-  sales.monthlySales += order.total || 0;
-
-  // ✅ حفظ التغييرات
   writeOrders(orders);
-  writeSales(sales);
 
-  console.log('طلب جديد:', order);
-  res.status(201).json({ message: 'تم إرسال الطلب' });
+  res.status(201).json({ message: 'تم إرسال الطلب بنجاح' });
 };
 
+// ✅ تغيير حالة الطلب إلى "تم" (بدلاً من الحذف)
+exports.markAsDone = (req, res) => {
+  const id = parseInt(req.params.id);
+  const order = orders.find(o => o.id === id);
+  if (order) {
+    order.status = 'done';
+    writeOrders(orders);
+    res.json({ message: 'تم التحديث' });
+  } else {
+    res.status(404).json({ error: 'الطلب غير موجود' });
+  }
+};
+
+// 🗑️ حذف الطلب (نستخدمه فقط في "تصفير اليوم")
 exports.deleteOrder = (req, res) => {
   const id = parseInt(req.params.id);
   const lengthBefore = orders.length;
-
-  // حذف الطلب من القائمة
   orders = orders.filter(order => order.id !== id);
-
-  // حفظ التغييرات في الملف
   writeOrders(orders);
-
-  // إرسال استجابة
   res.json({ deleted: lengthBefore !== orders.length });
+};
+
+// 🔄 تصفير جميع الطلبات (يستخدمه الأدمن لبدء يوم جديد)
+exports.resetOrders = (req, res) => {
+  orders = [];
+  writeOrders(orders);
+  res.json({ message: 'تم تصفير الطلبات' });
 };

@@ -33,12 +33,15 @@ async function loadMenu() {
       مقبلات: "appetizers",
       فطور: "ftor",
       "أطباق رئيسية": "main-dishes",
+            مشاوي: "mashawe",
+
       حلويات: "desserts",
       كوكتيلات: "koktel",
       "مشروبات باردة": "cold-drinks",
       "مشروبات ساخنة": "hot-drinks",
       شوربات: "soups",
       أراكيل: "arakeel",
+
     };
 
     // إضافة كل صنف إلى قسمه
@@ -64,6 +67,10 @@ async function loadMenu() {
         if (item.category === "شوربات") div.classList.add("soups");
         if (item.category === "كوكتيلات") div.classList.add("koktel");
         if (item.category === "عروض اليوم") div.classList.add("offers");
+                if (item.category === "سلطات") div.classList.add("salads");
+                                if (item.category === "مشاوي") div.classList.add("mashawe");
+
+
 
         div.innerHTML = `
           <h3>${item.name}</h3>

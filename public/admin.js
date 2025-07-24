@@ -1,103 +1,81 @@
-// 🔐 كلمة السر (غيرها حسب رغبتك)
-const ADMIN_PASSWORD = 'mataamak123';
 
-// 🔐 التحقق من كلمة السر عند الدخول
-function checkAdminPassword() {
-  const saved = localStorage.getItem('adminLoggedIn');
-  if (saved === 'true') return true;
-
-  const password = prompt('أدخل كلمة السر لفتح لوحة التحكم:');
-  if (password === ADMIN_PASSWORD) {
-    localStorage.setItem('adminLoggedIn', 'true');
-    return true;
-  } else {
-    alert('كلمة السر خاطئة!');
-    window.location.href = '/';
-    return false;
-  }
-}
-
-// إذا ما نجح التحقق، لا تظهر الصفحة
-if (!checkAdminPassword()) {
-  window.location.href = '/';
-}
-
-// 📥 تحميل القائمة (الأصناف)
+// 📥 تحميل القائمة
 async function fetchAndDisplayMenu() {
   try {
     const res = await fetch('/api/menu');
     const items = await res.json();
     const menuList = document.getElementById('menu-list');
     menuList.innerHTML = '';
-
     items.forEach(item => {
       const li = document.createElement('li');
-      li.innerHTML = `
-        <span>${item.name} - ${item.price} ل.س</span>
-        <button onclick="deleteMenuItem(${item.id})">حذف</button>
-      `;
+      li.innerHTML = `<span>${item.name} - ${item.price} ل.س</span> <button onclick="deleteMenuItem(${item.id})">حذف</button>`;
       menuList.appendChild(li);
     });
   } catch (err) {
     console.error("خطأ في تحميل القائمة:", err);
   }
+  
 }
 
-// ➕ إضافة صنف جديد
+// ➕ إضافة صنف
 document.getElementById('addForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const name = document.getElementById('name').value;
   const price = parseFloat(document.getElementById('price').value);
   const category = document.getElementById('category').value;
-  const image = document.getElementById('image').value;
-
   await fetch('/api/menu', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ name, price, category, image })
+    body: JSON.stringify({ name, price, category })
   });
-
-  alert('تمت إضافة الصنف!');
+  alert('تمت الإضافة!');
   document.getElementById('addForm').reset();
   fetchAndDisplayMenu();
 });
 
 // ❌ حذف صنف
 async function deleteMenuItem(id) {
-  if (confirm('هل أنت متأكد من حذف هذا الصنف؟')) {
+  if (confirm('حذف هذا الصنف؟')) {
     await fetch(`/api/menu/${id}`, { method: 'DELETE' });
-    alert('تم الحذف!');
     fetchAndDisplayMenu();
   }
 }
 
 // 📥 تحميل الطلبات
-let lastOrderCount = 0;
+let lastOrderCount = parseInt(localStorage.getItem('lastOrderCount')) || 0;
 
 async function fetchAndDisplayOrders() {
   try {
     const res = await fetch('/api/orders');
     const orders = await res.json();
+    const count = orders.length;
 
-    // 🔔 تنبيه عند طلب جديد
-    if (orders.length > lastOrderCount && lastOrderCount !== 0) {
-      playOrderNotification();
+    // تنبيه عند طلب جديد
+    if (count > lastOrderCount && lastOrderCount !== 0) {
+      playNotification();
     }
-    lastOrderCount = orders.length;
+    lastOrderCount = count;
+    localStorage.setItem('lastOrderCount', count);
 
     const container = document.getElementById('orders-list');
     container.innerHTML = '';
-
-    if (orders.length === 0) {
+    if (count === 0) {
       container.innerHTML = '<p class="no-orders">لا يوجد طلبات جديدة</p>';
       return;
     }
 
-    orders.forEach(order => {
+    // عرض الطلبات الجديدة فقط (اللي status !== 'done')
+    const newOrders = orders.filter(order => order.status !== 'done');
+    if (newOrders.length === 0) {
+      container.innerHTML = '<p class="no-orders">لا يوجد طلبات جديدة</p>';
+      return;
+    }
+
+    newOrders.forEach(order => {
       const card = document.createElement('div');
       card.className = 'order-card';
       card.innerHTML = `
-        <button onclick="markOrderAsDone(${order.id})" class="done-btn">✅ تم</button>
+        <button onclick="markAsDone(${order.id})" class="done-btn">✅ تم</button>
         <div class="order-header">طلب من الطاولة ${order.tableNumber}</div>
         <ul class="items-list">
           ${order.items.map(item => `<li>${item.name} × ${item.quantity}</li>`).join('')}
@@ -112,60 +90,78 @@ async function fetchAndDisplayOrders() {
   }
 }
 
-// 🔔 تنبيه عند طلب جديد
-function playOrderNotification() {
+// 🔔 تنبيه
+function playNotification() {
   const audio = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
   audio.play().catch(() => {});
   alert('طلب جديد وصل!');
 }
 
-// ✅ حذف الطلب بعد التحضير
-async function markOrderAsDone(orderId) {
-  if (confirm('هل تم تحضير الطلب؟')) {
-    await fetch(`/api/orders/${orderId}`, { method: 'DELETE' });
-    alert('تم حذف الطلب');
+// ✅ تم التحضير (غير الحالة، ما تحذف)
+async function markAsDone(orderId) {
+  if (confirm('هل تم التحضير؟')) {
+    await fetch(`/api/orders/${orderId}/done`, { method: 'PATCH' });
     fetchAndDisplayOrders();
   }
 }
 
-// 📥 تحميل المبيعات
-async function fetchAndDisplaySales() {
+// 📄 حفظ تقرير يومي
+async function saveDailyReport() {
   try {
-    const res = await fetch('/api/sales');
-    const sales = await res.json();
+    const res = await fetch('/api/orders');
+    const orders = await res.json();
+    const today = new Date().toISOString().split('T')[0];
+    const todayOrders = orders.filter(order => order.timestamp.startsWith(today));
 
-    document.getElementById('daily-sales').textContent = `مبيعات اليوم: ${sales.dailySales} ل.س`;
-    document.getElementById('monthly-sales').textContent = `مبيعات الشهر: ${sales.monthlySales} ل.س`;
+    if (todayOrders.length === 0) {
+      alert('لا يوجد طلبات ليوم اليوم');
+      return;
+    }
+
+    let report = `تقرير مبيعات مطعم MIAMI\n`;
+    report += `تاريخ: ${today}\n`;
+    report += `==============================\n\n`;
+
+    todayOrders.forEach((order, index) => {
+      report += `الطلب #${index + 1} - طاولة ${order.tableNumber}\n`;
+      order.items.forEach(item => {
+        report += `  - ${item.name} × ${item.quantity} = ${item.price * item.quantity} ل.س\n`;
+      });
+      report += `  المجموع: ${order.total} ل.س\n\n`;
+    });
+
+    const total = todayOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+    report += `==============================\n`;
+    report += `إجمالي المبيعات: ${total} ل.س`;
+
+    const blob = new Blob([report], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `تقرير_${today}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
   } catch (err) {
-    console.error("فشل تحميل المبيعات", err);
+    alert('فشل حفظ التقرير');
   }
 }
 
-// 🗑️ مسح مبيعات اليوم
-async function resetDailySales() {
-  if (confirm('هل أنت متأكد من مسح مبيعات اليوم؟')) {
-    await fetch('/api/sales/reset-daily', { method: 'POST' });
-    alert('تم مسح مبيعات اليوم');
-    fetchAndDisplaySales();
+// 🗑️ تصفير اليوم (مسح جميع الطلبات)
+async function resetDailyData() {
+  if (confirm('هل أنت متأكد من تصفير اليوم؟')) {
+    await fetch('/api/orders/reset', { method: 'POST' });
+    localStorage.removeItem('lastOrderCount');
+    lastOrderCount = 0;
+    fetchAndDisplayOrders();
+    alert('تم تصفير اليوم');
   }
 }
 
-// 🗑️ مسح مبيعات الشهر
-async function resetMonthlySales() {
-  if (confirm('هل أنت متأكد من مسح مبيعات الشهر؟')) {
-    await fetch('/api/sales/reset-monthly', { method: 'POST' });
-    alert('تم مسح مبيعات الشهر');
-    fetchAndDisplaySales();
-  }
-}
-
-// 🔄 تحديث تلقائي كل 3 و 5 ثواني
+// 🔄 تحديث كل 3 ثواني
 setInterval(fetchAndDisplayOrders, 3000);
-setInterval(fetchAndDisplaySales, 5000);
 
-// 🚀 أول تحميل (يجب أن يكون في النهاية)
+// 🚀 أول تحميل
 window.onload = () => {
   fetchAndDisplayMenu();
   fetchAndDisplayOrders();
-  fetchAndDisplaySales();
 };
