@@ -20,3 +20,5 @@ tmp/
 
 # ملفات المطورين (VS Code)
 .vscode/
+data/orders.json
+data/sales.json
