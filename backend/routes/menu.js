@@ -1,13 +1,9 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const {
-  getItems,
-  addItem,
-  deleteItem,
-} = require("../controllers/menuController");
+const { getMenu, addMenuItem, deleteMenuItem } = require('../controllers/menuController');
 
-router.get("/", getItems);
-router.post("/", addItem);
-router.delete("/:id", deleteItem);
+router.get('/', getMenu);
+router.post('/', addMenuItem);
+router.delete('/:id', deleteMenuItem);
 
 module.exports = router;

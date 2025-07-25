@@ -18,14 +18,13 @@ if (!tableNumber) {
 async function loadMenu() {
   try {
     const res = await fetch("/api/menu");
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
     const items = await res.json();
 
     // مسح كل الأقسام
-    document
-      .querySelectorAll(".items-grid")
-      .forEach((grid) => (grid.innerHTML = ""));
+    document.querySelectorAll(".items-grid").forEach(grid => grid.innerHTML = "");
 
-    // خريطة لربط الفئة بالمعرّف
+    // خريطة الفئات
     const sectionMap = {
       "عروض اليوم": "offers",
       بيتزا: "pizza",
@@ -33,59 +32,57 @@ async function loadMenu() {
       مقبلات: "appetizers",
       فطور: "ftor",
       "أطباق رئيسية": "main-dishes",
-            مشاوي: "mashawe",
-
+      مشاوي: "mashawe",
       حلويات: "desserts",
       كوكتيلات: "koktel",
       "مشروبات باردة": "cold-drinks",
       "مشروبات ساخنة": "hot-drinks",
       شوربات: "soups",
-      أراكيل: "arakeel",
-
+      أراكيل: "arakeel"
     };
 
-    // إضافة كل صنف إلى قسمه
-    items.forEach((item) => {
+    items.forEach(item => {
       const sectionKey = sectionMap[item.category];
       if (!sectionKey) return;
 
-      const sectionId = `${sectionKey}-section`;
-      const grid = document.querySelector(`#${sectionId} .items-grid`);
-      if (grid) {
-        const div = document.createElement("div");
-        div.className = "item-card";
+      const grid = document.querySelector(`#${sectionKey}-section .items-grid`);
+      if (!grid) return;
 
-        // إضافة كلاس حسب القسم لتغير التوهج
-        if (item.category === "بيتزا") div.classList.add("pizza");
-        if (item.category === "مشروبات باردة") div.classList.add("cold");
-        if (item.category === "مشروبات ساخنة") div.classList.add("hot");
-        if (item.category === "أطباق رئيسية") div.classList.add("main");
-        if (item.category === "حلويات") div.classList.add("desserts");
-        if (item.category === "مقبلات") div.classList.add("appetizers");
-        if (item.category === "أراكيل") div.classList.add("arakeel");
-        if (item.category === "فطور") div.classList.add("ftor");
-        if (item.category === "شوربات") div.classList.add("soups");
-        if (item.category === "كوكتيلات") div.classList.add("koktel");
-        if (item.category === "عروض اليوم") div.classList.add("offers");
-                if (item.category === "سلطات") div.classList.add("salads");
-                                if (item.category === "مشاوي") div.classList.add("mashawe");
+      const div = document.createElement("div");
+      div.className = "item-card";
 
+      // إضافة كلاس حسب القسم
+      const classMap = {
+        بيتزا: "pizza",
+        "مشروبات باردة": "cold",
+        "مشروبات ساخنة": "hot",
+        "أطباق رئيسية": "main",
+        حلويات: "desserts",
+        مقبلات: "appetizers",
+        أراكيل: "arakeel",
+        فطور: "ftor",
+        شوربات: "soups",
+        كوكتيلات: "koktel",
+        "عروض اليوم": "offers",
+        سلطات: "salads",
+        مشاوي: "mashawe"
+      };
 
+      const cssClass = classMap[item.category];
+      if (cssClass) div.classList.add(cssClass);
 
-        div.innerHTML = `
-          <h3>${item.name}</h3>
-          <p>${item.price} ل.س</p>
-          <button onclick="addToCart(${item.id}, '${item.name}', ${item.price})">+</button>
-        `;
-        grid.appendChild(div);
-      }
+      div.innerHTML = `
+        <h3>${item.name}</h3>
+        <p>${item.price} ل.س</p>
+        <button onclick="addToCart(${item.id}, '${item.name.replace(/'/g, "\\'")}', ${item.price})">+</button>
+      `;
+      grid.appendChild(div);
     });
   } catch (err) {
     console.error("خطأ في تحميل القائمة", err);
-    alert("فشل تحميل الأصناف");
+    alert("فشل تحميل الأصناف. تأكد من اتصال السيرفر.");
   }
 }
-
 // إضافة صنف للسلة
 function addToCart(id, name, price) {
   const item = cart.find((i) => i.id === id);
@@ -141,8 +138,12 @@ function removeItem(index) {
   updateCart();
 }
 async function submitOrder() {
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  if (cart.length === 0) {
+    alert("السلة فارغة!");
+    return;
+  }
 
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const order = {
     tableNumber: parseInt(tableNumber),
     items: cart,
@@ -152,9 +153,7 @@ async function submitOrder() {
   try {
     const res = await fetch('/api/orders', {
       method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json' 
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(order)
     });
 
@@ -164,10 +163,11 @@ async function submitOrder() {
       updateCart();
       document.getElementById('cart-container').classList.remove('show');
     } else {
-      alert('فشل إرسال الطلب: ' + res.status);
+      const error = await res.text();
+      alert(`فشل الإرسال: ${res.status} - ${error}`);
     }
   } catch (err) {
-    alert('خطأ في الإرسال: ' + err.message);
+    alert('خطأ في الاتصال بالسيرفر. تأكد من تشغيله.');
   }
 }
 // أقسام

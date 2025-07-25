@@ -510,18 +510,20 @@ section h2 {
 /* عربة التسوق */
 #cart-container {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 100px;
   background: #fff;
-  width: 90%;
-  max-width: 400px;
-  padding: 1.5rem;
+  width: 100%;
+  padding: 15px;
   z-index: 1000;
-  border-radius: 1rem;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -6px 16px rgba(0, 0, 0, 0.2);
   display: none;
   box-sizing: border-box;
+  overflow-y: auto;
+  max-height: calc(100vh - 150px);
 }
 #cart-container.show {
   display: block;

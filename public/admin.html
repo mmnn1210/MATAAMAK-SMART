@@ -1,82 +1,194 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>لوحة تحكم MIAMI</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <h1 class="page-title">لوحة تحكم MIAMI</h1>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>لوحة تحكم MIAMI</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* تصميم بطاقات الطلبات */
+    .order-card {
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #f0f0f0;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
 
-    <!-- إضافة صنف جديد -->
-    <div style="text-align: center; margin: 20px">
-      <form id="addForm">
-        <input type="text" id="name" placeholder="اسم الصنف" required />
-        <input type="number" id="price" placeholder="السعر" required />
-        <select id="category" required>
-          <option value="عروض اليوم">عروض اليوم</option>
-          <option value="بيتزا">بيتزا</option>
-          <option value="مشاوي">مشاوي</option>
+    .order-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
 
-          <option value="فطور">فطور</option>
-          <option value="مقبلات">مقبلات</option>
-          <option value="أطباق رئيسية">أطباق رئيسية</option>
-          <option value="سلطات">سلطات</option>
-          <option value="شوربات">شوربات</option>
-          <option value="حلويات">حلويات</option>
-          <option value="كوكتيلات">كوكتيلات</option>
-          <option value="مشروبات باردة">مشروبات باردة</option>
-          <option value="مشروبات ساخنة">مشروبات ساخنة</option>
-          <option value="أراكيل">أراكيل</option>
-        </select>
-        <button type="submit">➕ إضافة</button>
-      </form>
-    </div>
+    .order-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 6px;
+      height: 100%;
+      background: linear-gradient(to bottom, #ff6b6b, #e91e63);
+      border-radius: 0 8px 8px 0;
+    }
 
-    <!-- قائمة الأصناف -->
-    <div style="text-align: center; margin: 20px">
-      <h3>🗂️ قائمة الأصناف</h3>
-      <ul id="menu-list"></ul>
-    </div>
+    .order-header {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #111;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-    <!-- زر حفظ التقرير -->
-    <div style="text-align: center; margin: 20px 0">
-      <button
-        onclick="saveDailyReport()"
-        style="
-          background: #4caf50;
-          color: white;
-          border: none;
-          padding: 12px 24px;
-          border-radius: 8px;
-          font-size: 1.1rem;
-        "
-      >
-        📄 حفظ تقرير اليوم
-      </button>
-      <button
-        onclick="resetDailyData()"
-        style="
-          background: #d6336c;
-          color: white;
-          border: none;
-          padding: 12px 24px;
-          border-radius: 8px;
-          font-size: 1.1rem;
-          margin: 0 10px;
-        "
-      >
-        🗑️ تصفير اليوم
-      </button>
-    </div>
+    .order-header::before {
+      content: '🍽️';
+    }
 
-    <!-- الطلبات الجديدة -->
-    <h2 style="text-align: center; color: #d6336c">📬 الطلبات الجديدة</h2>
-    <div id="orders-list">
-      <p class="no-orders">جاري تحميل الطلبات...</p>
-    </div>
+    .items-list {
+      list-style: none;
+      padding: 0;
+      margin: 8px 0;
+      font-size: 0.95rem;
+      color: #333;
+    }
 
-    <script src="admin.js"></script>
-  </body>
+    .items-list li {
+      padding: 4px 0;
+      border-bottom: 1px dashed #eee;
+    }
+
+    .items-list li:last-child {
+      border-bottom: none;
+    }
+
+    .total {
+      font-weight: bold;
+      color: #1976d2;
+      font-size: 1.1rem;
+      margin: 10px 0;
+      padding: 8px 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .done-btn {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      background: #4caf50;
+      color: white;
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: background 0.3s ease;
+    }
+
+    .done-btn:hover {
+      background: #388e3c;
+    }
+
+    .order-card small {
+      color: #777;
+      font-size: 0.85rem;
+      display: block;
+      text-align: left;
+      margin-top: 6px;
+    }
+
+    .no-orders {
+      text-align: center;
+      color: #999;
+      font-size: 1.1rem;
+      padding: 30px;
+      margin: 20px 0;
+      background: #f8f9fa;
+      border-radius: 12px;
+      border: 2px dashed #e0e0e0;
+    }
+
+    #orders-list {
+      padding: 0 10px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .order-card {
+      animation: fadeInUp 0.4s ease forwards;
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    @keyframes fadeInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1 class="page-title">لوحة تحكم MIAMI</h1>
+
+  <!-- إضافة صنف جديد -->
+  <div style="text-align: center; margin: 20px">
+    <form id="addForm">
+      <input type="text" id="name" placeholder="اسم الصنف" required />
+      <input type="number" id="price" placeholder="السعر" required />
+      <select id="category" required>
+        <option value="عروض اليوم">عروض اليوم</option>
+        <option value="بيتزا">بيتزا</option>
+        <option value="مشاوي">مشاوي</option>
+        <option value="فطور">فطور</option>
+        <option value="مقبلات">مقبلات</option>
+        <option value="أطباق رئيسية">أطباق رئيسية</option>
+        <option value="سلطات">سلطات</option>
+        <option value="شوربات">شوربات</option>
+        <option value="حلويات">حلويات</option>
+        <option value="كوكتيلات">كوكتيلات</option>
+        <option value="مشروبات باردة">مشروبات باردة</option>
+        <option value="مشروبات ساخنة">مشروبات ساخنة</option>
+        <option value="أراكيل">أراكيل</option>
+      </select>
+      <button type="submit">➕ إضافة</button>
+    </form>
+  </div>
+
+  <!-- قائمة الأصناف -->
+  <div style="text-align: center; margin: 20px">
+    <h3>🗂️ قائمة الأصناف</h3>
+    <div class="items-grid" id="menu-list"></div>
+  </div>
+
+  <!-- زر حفظ التقرير وتفرير اليوم -->
+  <div style="text-align: center; margin: 20px 0">
+    <button
+      onclick="saveDailyReport()"
+      style="background:#4CAF50; color:white; border:none; padding:12px 24px; border-radius:8px; font-size:1.1rem;">
+      📄 حفظ تقرير اليوم
+    </button>
+    <button
+      onclick="resetDailyData()"
+      style="background:#d6336c; color:white; border:none; padding:12px 24px; border-radius:8px; font-size:1.1rem; margin:0 10px;">
+      🗑️ تصفير اليوم
+    </button>
+  </div>
+
+  <!-- الطلبات الجديدة -->
+  <h2 style="text-align:center;color:#d6336c;">📬 الطلبات الجديدة</h2>
+  <div id="orders-list">
+    <p class="no-orders">جاري تحميل الطلبات...</p>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
 </html>

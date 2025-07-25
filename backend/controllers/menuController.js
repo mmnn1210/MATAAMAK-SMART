@@ -1,37 +1,39 @@
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-const filePath = path.join(__dirname, "../../data/menu.json");
+const menuFilePath = path.join(__dirname, '../../data/menu.json');
 
 function readMenu() {
-  if (fs.existsSync(filePath)) {
-    const data = fs.readFileSync(filePath, "utf8");
+  if (fs.existsSync(menuFilePath)) {
+    const data = fs.readFileSync(menuFilePath, 'utf8');
     return JSON.parse(data);
   }
   return [];
 }
 
 function writeMenu(data) {
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+  fs.writeFileSync(menuFilePath, JSON.stringify(data, null, 2));
 }
 
-let menuItems = readMenu();
+let menu = readMenu();
 
-exports.getItems = (req, res) => {
-  res.json(menuItems);
+exports.getMenu = (req, res) => {
+  res.json(menu);
 };
 
-exports.addItem = (req, res) => {
-  const newItem = { ...req.body, id: Date.now() };
-  menuItems.push(newItem);
-  writeMenu(menuItems);
-  res.status(201).json(newItem);
+exports.addMenuItem = (req, res) => {
+  const item = {
+    ...req.body,
+    id: Date.now()
+  };
+  menu.push(item);
+  writeMenu(menu);
+  res.status(201).json(item);
 };
 
-exports.deleteItem = (req, res) => {
+exports.deleteMenuItem = (req, res) => {
   const id = parseInt(req.params.id);
-  const lengthBefore = menuItems.length;
-  menuItems = menuItems.filter((item) => item.id !== id);
-  writeMenu(menuItems);
-  res.json({ deleted: lengthBefore !== menuItems.length });
+  menu = menu.filter(item => item.id !== id);
+  writeMenu(menu);
+  res.json({ success: true });
 };
