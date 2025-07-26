@@ -33,3 +33,18 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 السيرفر يعمل على http://localhost:${PORT}`);
 });
+// حفظ تلقائي كل 30 ثانية
+setInterval(() => {
+  try {
+    fs.writeFileSync(
+      path.join(__dirname, 'data', 'orders.json'),
+      JSON.stringify(orders, null, 2)
+    );
+    fs.writeFileSync(
+      path.join(__dirname, 'data', 'menu.json'),
+      JSON.stringify(menu, null, 2)
+    );
+  } catch (err) {
+    console.error("فشل الحفظ التلقائي", err);
+  }
+}, 30000); // كل 30 ثانية

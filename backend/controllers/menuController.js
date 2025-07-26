@@ -28,6 +28,8 @@ exports.addMenuItem = (req, res) => {
   };
   menu.push(item);
   writeMenu(menu);
+    console.log('✅ صنف جديد أُضيف:', item); // رسالة تأكيد
+
   res.status(201).json(item);
 };
 
